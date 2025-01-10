@@ -2,6 +2,20 @@
 require 'function.php';
 require 'cek.php';
 require_once("assets/phpqrcode/qrlib.php");
+
+if(isset($_POST['addmahasiswa'])){
+    $nim = $_POST['nim'];
+    $nama = $_POST['nama'];
+    $prodi = $_POST['prodi'];
+
+    // Generate QR code
+    $fileName = "qrcodes/" . $nim . ".png";
+    QRcode::png($nim, $fileName, "H", 4, 4);
+
+    // Save data to database
+    $query = "INSERT INTO mahasiswa (nim, nama, prodi, kodeqr) VALUES ('$nim', '$nama', '$prodi', '$fileName')";
+    mysqli_query($conn, $query);
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +26,7 @@ require_once("assets/phpqrcode/qrlib.php");
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Inventaris Senjata</title>
+        <title>Data Mahasiswa</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
@@ -24,8 +38,7 @@ require_once("assets/phpqrcode/qrlib.php");
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-            <a class="navbar-brand" href="index.php">Sistem Inventaris Senjata UNHAN RI</a>
-
+            <a class="navbar-brand" href="index.php">Sistem Data Mahasiswa UNHAN RI</a>
         </nav>
         <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -40,10 +53,6 @@ require_once("assets/phpqrcode/qrlib.php");
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Data Mahasiswa
                             </a>
-                            <a class="nav-link" href="pengambilan.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Pengambilan Senjata
-                            </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
                             </a>
@@ -54,13 +63,13 @@ require_once("assets/phpqrcode/qrlib.php");
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
-                        <h1 class="mt-4">Inventaris Senjata</h1>
+                        <h1 class="mt-4">Data Mahasiswa</h1>
 
                         <div class="card mb-4">
                             <div class="card-header">
                                 <!-- Button to Open the Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                                    Tambah Senjata
+                                    Tambah Mahasiswa
                                 </button>
                             </div>
                             <div class="card-body">
@@ -69,32 +78,28 @@ require_once("assets/phpqrcode/qrlib.php");
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Nomor Senjata</th>
-                                                <th>Keterangan</th>
+                                                <th>NIM</th>
+                                                <th>Nama</th>
+                                                <th>Prodi</th>
                                                 <th>QR Code</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $ambildatasenjata = mysqli_query($conn, "select * from senjata");
+                                            $ambildatamahasiswa = mysqli_query($conn, "select * from mahasiswa");
                                             $i = 1;
-                                            while($data=mysqli_fetch_array($ambildatasenjata)){
+                                            while($data=mysqli_fetch_array($ambildatamahasiswa)){
                                                 
-                                                $nosenjata = $data['nosenjata'];
-                                                $keterangan = $data['keterangan'];
-                                                
-                                                // Generate QR code
-                                                $fileName = "qrcodes/" . $nosenjata . ".png";
-                                                QRcode::png($nosenjata, $fileName, "H", 4, 4);
-
-                                                // Save QR code file name in the database
-                                                $updateQuery = "UPDATE senjata SET kodeqr='$fileName' WHERE nosenjata='$nosenjata'";
-                                                mysqli_query($conn, $updateQuery);
+                                                $nim = $data['nim'];
+                                                $nama = $data['nama'];
+                                                $prodi = $data['prodi'];
+                                                $fileName = $data['kodeqr'];
                                             ?>
                                             <tr>
                                                 <td><?=$i++;?></td>
-                                                <td><?=$nosenjata;?></td>
-                                                <td><?=$keterangan;?></td>
+                                                <td><?=$nim;?></td>
+                                                <td><?=$nama;?></td>
+                                                <td><?=$prodi;?></td>
                                                 <td>
                                                     <img src="<?=$fileName;?>" alt="QR Code">
                                                 </td>
@@ -142,18 +147,20 @@ require_once("assets/phpqrcode/qrlib.php");
             
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Tambah Senjata</h4>
+                    <h4 class="modal-title">Tambah Mahasiswa</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 
                 <!-- Modal body -->
                 <form method="post">
                     <div class="modal-body">
-                        <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
+                        <input type="text" name="nim" id="nim" placeholder="NIM" class="form-control" required>
                         <br> 
-                        <input type="text" name="keterangan" placeholder="Keterangan senjata" class="form-control" required>
+                        <input type="text" name="nama" placeholder="Nama" class="form-control" required>
                         <br>
-                        <button type="submit" class="btn btn-primary" name="addsenjata">Submit</button>
+                        <input type="text" name="prodi" placeholder="Prodi" class="form-control" required>
+                        <br>
+                        <button type="submit" class="btn btn-primary" name="addmahasiswa">Submit</button>
                     </div>
                 </form>
             </div>

@@ -2,12 +2,37 @@
 require 'function.php';
 require 'cek.php';
 
-// Fetch the list of students
+// Ambil daftar mahasiswa
 $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
+
+// Periksa apakah acara dan dinas sudah disetel dalam sesi
+if (!isset($_SESSION['id_acara_dinas'])) {
+    // Alihkan ke halaman acara_dinas jika belum disetel
+    header("Location: acara_dinas.php");
+    exit();
+}
+
+$id_acara_dinas = $_SESSION['id_acara_dinas'];
+
+// Proses pengambilan senjata
+if (isset($_POST['senjatakeluar'])) {
+    $nosenjata = $_POST['nosenjata'];
+    $penerima = $_POST['penerima'];
+    $tanggal = date('Y-m-d');
+
+    // Ambil idsenjata berdasarkan nosenjata
+    $senjataQuery = mysqli_query($conn, "SELECT idsenjata FROM senjata WHERE nosenjata='$nosenjata'");
+    $senjataData = mysqli_fetch_array($senjataQuery);
+    $idsenjata = $senjataData['idsenjata'];
+
+    // Simpan data pengambilan ke dalam tabel pengambilan
+    $insertQuery = "INSERT INTO pengambilan (idsenjata, tanggal, penerima, id_acara_dinas) VALUES ('$idsenjata', '$tanggal', '$penerima', '$id_acara_dinas')";
+    mysqli_query($conn, $insertQuery);
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -38,6 +63,10 @@ $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Data Senjata
                             </a>
+                            <a class="nav-link" href="mahasiswa.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Data Mahasiswa
+                            </a>
                             <a class="nav-link" href="pengambilan.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Pengambilan Senjata
@@ -56,7 +85,7 @@ $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
 
                         <div class="card mb-4">
                             <div class="card-header">
-                                <!-- Button to Open the Modal -->
+                                <!-- Tombol untuk Membuka Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Pengambilan Senjata
                                 </button>
@@ -123,24 +152,25 @@ $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="assets/demo/datatables-demo.js"></script>
     </body>
-            <!-- The Modal -->
+            <!-- Modal -->
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
         <div class="modal-content">
         
-            <!-- Modal Header -->
+            <!-- Header Modal -->
             <div class="modal-header">
                 <h4 class="modal-title">Pengambilan Senjata</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             
-            <!-- Modal body -->
+            <!-- Body Modal -->
             <form method="post">
                 <div class="modal-body">
+                    <p>Acara dan Dinas: <?= $id_acara_dinas ?></p>
                     <video id="preview" width="100%"></video>
                     <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
                     <br>
-                    <!-- Dropdown for selecting penerima -->
+                    <!-- Dropdown untuk memilih penerima -->
                     <select id="penerimaDropdown" name="penerima" class="form-control" required>
                         <option value="">Pilih Penerima</option>
                         <?php while($row = mysqli_fetch_array($mahasiswaQuery)) { ?>
@@ -172,12 +202,12 @@ $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
         </div>
     </div>
 
-<!-- Include Select2 library -->
+<!-- Sertakan pustaka Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Initialize Select2 for the dropdown
+        // Inisialisasi Select2 untuk dropdown
         $('#penerimaDropdown').select2();
     });
 </script>
