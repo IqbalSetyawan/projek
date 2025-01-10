@@ -1,6 +1,7 @@
 <?php
 require 'function.php';
 require 'cek.php';
+require_once("assets/phpqrcode/qrlib.php");
 ?>
 
 <!DOCTYPE html>
@@ -66,7 +67,7 @@ require 'cek.php';
                                                 <th>No</th>
                                                 <th>Nomor Senjata</th>
                                                 <th>Keterangan</th>
-                                                <th>Barcode</th>
+                                                <th>QR Code</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -77,13 +78,23 @@ require 'cek.php';
                                                 
                                                 $nosenjata = $data['nosenjata'];
                                                 $keterangan = $data['keterangan'];
-                                            
+                                                
+                                                // Generate QR code
+                                                $fileName = "qrcodes/" . $nosenjata . ".png";
+                                                QRcode::png($nosenjata, $fileName, "H", 4, 4);
+
+                                                // Save QR code file name in the database
+                                                $updateQuery = "UPDATE senjata SET kodeqr='$fileName' WHERE nosenjata='$nosenjata'";
+                                                mysqli_query($conn, $updateQuery);
                                             ?>
                                             <tr>
                                                 <td><?=$i++;?></td>
                                                 <td><?=$nosenjata;?></td>
                                                 <td><?=$keterangan;?></td>
-                                                <td>To be filled</td>
+                                                <td>
+                                                    <img src="<?=$fileName;?>" alt="QR Code">
+                                                </td>
+
                                             </tr>
                                             <?php
                                             };
@@ -98,11 +109,11 @@ require 'cek.php';
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                            <div class="text-muted">Biro Umum dan Perencanaan</div>
                             <div>
-                                <a href="#">Privacy Policy</a>
+                                <a>Universitas Pertahanan RI</a>
                                 &middot;
-                                <a href="#">Terms &amp; Conditions</a>
+                                <a>2024</a>
                             </div>
                         </div>
                     </div>
@@ -134,29 +145,11 @@ require 'cek.php';
                 <!-- Modal body -->
                 <form method="post">
                     <div class="modal-body">
-                        <video id="preview" width="100%"></video>
                         <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
                         <br> 
                         <input type="text" name="keterangan" placeholder="Keterangan senjata" class="form-control" required>
                         <br>
                         <button type="submit" class="btn btn-primary" name="addsenjata">Submit</button>
-                        <script>
-                        let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-                        Instascan.Camera.getCameras().then(function(cameras) {
-                            if (cameras.length > 0) {
-                                scanner.start(cameras[0]);
-                            } else {
-                                alert('No cameras found');
-                            }
-
-                        }).catch(function(e) {
-                            console.error(e);
-                        });
-
-                        scanner.addListener('scan', function(c) {
-                            document.getElementById('nosenjata').value = c;
-                        });
-                    </script>
                     </div>
                 </form>
             </div>

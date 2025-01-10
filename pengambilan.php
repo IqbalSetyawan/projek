@@ -1,6 +1,9 @@
 <?php
 require 'function.php';
 require 'cek.php';
+
+// Fetch the list of students
+$mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
 ?>
 
 <!DOCTYPE html>
@@ -15,6 +18,10 @@ require 'cek.php';
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/3.3.3/adapter.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
+        <script type="text/javascript" src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
     </head>
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -63,7 +70,7 @@ require 'cek.php';
                                                 <th>Nomor Senjata</th>
                                                 <th>Tanggal Keluar</th>
                                                 <th>Peminjam</th>
-                                                <th>Cohort</th>
+                                                <th>NIM</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -74,7 +81,6 @@ require 'cek.php';
                                                 $nosenjata = $data['nosenjata'];
                                                 $tanggal = $data['tanggal'];
                                                 $penerima = $data['penerima'];
-                                                $cohort = $data['cohort'];
                                             
                                             ?>
                                             <tr>
@@ -82,7 +88,6 @@ require 'cek.php';
                                                 <td><?=$nosenjata;?></td>
                                                 <td><?=$tanggal;?></td>
                                                 <td><?=$penerima;?></td>
-                                                <td><?=$cohort;?></td>
                                             </tr>
                                             <?php
                                             };
@@ -97,11 +102,11 @@ require 'cek.php';
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                            <div class="text-muted">Biro Umum dan Perencanaan</div>
                             <div>
-                                <a href="#">Privacy Policy</a>
+                                <a>Universitas Pertahanan RI</a>
                                 &middot;
-                                <a href="#">Terms &amp; Conditions</a>
+                                <a>2024</a>
                             </div>
                         </div>
                     </div>
@@ -125,36 +130,55 @@ require 'cek.php';
         
             <!-- Modal Header -->
             <div class="modal-header">
-            <h4 class="modal-title">Pengambilan Senjata</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Pengambilan Senjata</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             
             <!-- Modal body -->
             <form method="post">
                 <div class="modal-body">
-                    <select name="senjatanya" class="form-control">
-                    <?php
-                    $ambildata = mysqli_query($conn, "select * from senjata");
-                    while ($fetcharray = mysqli_fetch_array($ambildata)) {
-                        $nosenjatanya = $fetcharray['nosenjata'];
-                        $idsenjatanya = $fetcharray['idsenjata'];
-                    ?>
-                        <option value="<?= $idsenjatanya; ?>"><?= $nosenjatanya; ?></option>
-                    <?php
-                    }
-                    ?>
+                    <video id="preview" width="100%"></video>
+                    <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
+                    <br>
+                    <!-- Dropdown for selecting penerima -->
+                    <select id="penerimaDropdown" name="penerima" class="form-control" required>
+                        <option value="">Pilih Penerima</option>
+                        <?php while($row = mysqli_fetch_array($mahasiswaQuery)) { ?>
+                            <option value="<?=$row['id']?>"><?=$row['nama']?></option>
+                        <?php } ?>
                     </select>
                     <br>
-                    <input type="text" name="penerima" class="form-control" placeholder="Penerima" required>
-                    <br>
-                    <input type="number" name="cohort" class="form-control" placeholder="Cohort" required>
-                    <br>
                     <button type="submit" class="btn btn-primary" name="senjatakeluar">Submit</button>
+                    <script>
+                    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+                    Instascan.Camera.getCameras().then(function(cameras) {
+                        if (cameras.length > 0) {
+                            scanner.start(cameras[0]);
+                        } else {
+                            alert('No cameras found');
+                        }
+
+                    }).catch(function(e) {
+                        console.error(e);
+                    });
+
+                    scanner.addListener('scan', function(c) {
+                        document.getElementById('nosenjata').value = c;
+                    });
+                </script>
                 </div>
-        </form>
-
-
+            </form>
         </div>
         </div>
     </div>
+
+<!-- Include Select2 library -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for the dropdown
+        $('#penerimaDropdown').select2();
+    });
+</script>
 </html>
