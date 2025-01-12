@@ -53,6 +53,10 @@ if(isset($_POST['addmahasiswa'])){
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Data Mahasiswa
                             </a>
+                            <a class="nav-link" href="pengambilan.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Pengambilan Senjata
+                            </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
                             </a>
@@ -81,7 +85,6 @@ if(isset($_POST['addmahasiswa'])){
                                                 <th>NIM</th>
                                                 <th>Nama</th>
                                                 <th>Prodi</th>
-                                                <th>QR Code</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -93,17 +96,12 @@ if(isset($_POST['addmahasiswa'])){
                                                 $nim = $data['nim'];
                                                 $nama = $data['nama'];
                                                 $prodi = $data['prodi'];
-                                                $fileName = $data['kodeqr'];
                                             ?>
                                             <tr>
                                                 <td><?=$i++;?></td>
                                                 <td><?=$nim;?></td>
                                                 <td><?=$nama;?></td>
                                                 <td><?=$prodi;?></td>
-                                                <td>
-                                                    <img src="<?=$fileName;?>" alt="QR Code">
-                                                </td>
-
                                             </tr>
                                             <?php
                                             };
@@ -138,7 +136,6 @@ if(isset($_POST['addmahasiswa'])){
         <script src="assets/demo/chart-bar-demo.js"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
-        <script src="assets/demo/datatables-demo.js"></script>
     </body>
         <!-- The Modal -->
     <div class="modal fade" id="myModal">
@@ -158,7 +155,19 @@ if(isset($_POST['addmahasiswa'])){
                         <br> 
                         <input type="text" name="nama" placeholder="Nama" class="form-control" required>
                         <br>
-                        <input type="text" name="prodi" placeholder="Prodi" class="form-control" required>
+                        <select name="prodi" class="form-control" required>
+                            <option value="" disabled selected>Pilih Prodi</option>
+                            <option value="Kedokteran">Kedokteran</option>
+                            <option value="Farmasi">Farmasi</option>
+                            <option value="Fisika">Fisika</option>
+                            <option value="Kimia">Kimia</option>
+                            <option value="Biologi">Biologi</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Teknik Elektro">Teknik Elektro</option>
+                            <option value="Teknik Sipil">Teknik Sipil</option>
+                            <option value="Teknik Mesin">Teknik Mesin</option>
+                        </select>
                         <br>
                         <button type="submit" class="btn btn-primary" name="addmahasiswa">Submit</button>
                     </div>

@@ -17,17 +17,15 @@ $id_acara_dinas = $_SESSION['id_acara_dinas'];
 // Proses pengambilan senjata
 if (isset($_POST['senjatakeluar'])) {
     $nosenjata = $_POST['nosenjata'];
-    $penerima = $_POST['penerima'];
-    $tanggal = date('Y-m-d');
+    $id_mahasiswa = $_POST['penerima'];
+    $tanggal_waktu = date('Y-m-d H:i:s');
 
     // Ambil idsenjata berdasarkan nosenjata
     $senjataQuery = mysqli_query($conn, "SELECT idsenjata FROM senjata WHERE nosenjata='$nosenjata'");
     $senjataData = mysqli_fetch_array($senjataQuery);
     $idsenjata = $senjataData['idsenjata'];
 
-    // Simpan data pengambilan ke dalam tabel pengambilan
-    $insertQuery = "INSERT INTO pengambilan (idsenjata, tanggal, penerima, id_acara_dinas) VALUES ('$idsenjata', '$tanggal', '$penerima', '$id_acara_dinas')";
-    mysqli_query($conn, $insertQuery);
+
 }
 ?>
 
@@ -89,6 +87,8 @@ if (isset($_POST['senjatakeluar'])) {
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Pengambilan Senjata
                                 </button>
+                                <!-- Tombol untuk Kembali ke Acara Dinas -->
+                                <a href="acara_dinas.php" class="btn btn-secondary">Kembali ke Acara Dinas</a>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -97,26 +97,27 @@ if (isset($_POST['senjatakeluar'])) {
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nomor Senjata</th>
-                                                <th>Tanggal Keluar</th>
+                                                <th>Tanggal Keluar & Waktu Peminjaman</th>
                                                 <th>Peminjam</th>
-                                                <th>NIM</th>
+                                                <th>Acara</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $ambildatasenjata = mysqli_query($conn, "select * from pengambilan p, senjata s where s.idsenjata = p.idsenjata");
+                                            $ambildatasenjata = mysqli_query($conn, "SELECT p.*, s.nosenjata, m.nama as penerima, a.nama_acara FROM pengambilan p JOIN senjata s ON s.idsenjata = p.idsenjata JOIN mahasiswa m ON m.id_mahasiswa = p.id_mahasiswa JOIN acara_dinas a ON a.id_acara_dinas = p.id_acara_dinas");
                                             $i = 1;
                                             while($data=mysqli_fetch_array($ambildatasenjata)){
                                                 $nosenjata = $data['nosenjata'];
-                                                $tanggal = $data['tanggal'];
+                                                $tanggal = $data['tanggal_waktu'];
                                                 $penerima = $data['penerima'];
-                                            
+                                                $acara = $data['nama_acara'];
                                             ?>
                                             <tr>
                                                 <td><?=$i++;?></td>
                                                 <td><?=$nosenjata;?></td>
                                                 <td><?=$tanggal;?></td>
                                                 <td><?=$penerima;?></td>
+                                                <td><?=$acara;?></td>
                                             </tr>
                                             <?php
                                             };
@@ -160,7 +161,7 @@ if (isset($_POST['senjatakeluar'])) {
             <!-- Header Modal -->
             <div class="modal-header">
                 <h4 class="modal-title">Pengambilan Senjata</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" data-dismiss="modal">&times;"></button>
             </div>
             
             <!-- Body Modal -->
@@ -174,9 +175,10 @@ if (isset($_POST['senjatakeluar'])) {
                     <select id="penerimaDropdown" name="penerima" class="form-control" required>
                         <option value="">Pilih Penerima</option>
                         <?php while($row = mysqli_fetch_array($mahasiswaQuery)) { ?>
-                            <option value="<?=$row['id']?>"><?=$row['nama']?></option>
+                            <option value="<?=$row['id_mahasiswa']?>"><?=$row['nama']?></option>
                         <?php } ?>
                     </select>
+                    <br>
                     <br>
                     <button type="submit" class="btn btn-primary" name="senjatakeluar">Submit</button>
                     <script>

@@ -1,15 +1,22 @@
 <?php
-session_start(); // Tambahkan ini untuk memulai sesi
 require 'function.php';
 require 'cek.php';
 
 if (isset($_POST['submitAcaraDinas'])) {
     $acara = $_POST['acara'];
     $dinas = $_POST['dinas'];
-    // Simpan acara dan dinas yang dipilih dalam variabel sesi
-    $_SESSION['acara'] = $acara;
-    $_SESSION['dinas'] = $dinas;
-    // Alihkan ke halaman pengambilan
+
+    // Insert data into acara_dinas table
+    $query = "INSERT INTO acara_dinas (nama_acara, jenis_dinas) VALUES ('$acara', '$dinas')";
+    mysqli_query($conn, $query);
+
+    // Get the last inserted id
+    $id_acara_dinas = mysqli_insert_id($conn);
+
+    // Save acara and dinas in session variables
+    $_SESSION['id_acara_dinas'] = $id_acara_dinas;
+
+    // Redirect to pengambilan.php
     header("Location: pengambilan.php");
     exit();
 }
