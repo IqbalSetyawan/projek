@@ -181,7 +181,6 @@ if (isset($_POST['senjatakeluar'])) {
             <!-- Body Modal -->
             <form method="post">
                 <div class="modal-body">
-                    <p>Acara dan Dinas: <?= $id_acara_dinas ?></p>
                     <video id="preview" width="100%"></video>
                     <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
                     <br>

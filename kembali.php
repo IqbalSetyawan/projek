@@ -13,29 +13,37 @@ if (!$conn) {
 // Ambil daftar mahasiswa
 $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
 
-// Periksa apakah acara dan dinas sudah disetel dalam sesi
-if (!isset($_SESSION['id_acara_dinas'])) {
-    // Alihkan ke halaman acara_dinas jika belum disetel
-    header("Location: acara_dinas.php");
-    exit();
-}
-
-$id_acara_dinas = $_SESSION['id_acara_dinas'];
-
 // Proses pengembalian senjata
-if (isset($_POST['senjatakembali'])) {
-    $nosenjata = $_POST['nosenjata'];
-    $tanggal_waktu = date('Y-m-d H:i:s');
-
-    // Debugging: Check the values of nosenjata and id_acara_dinas
-    error_log("nosenjata: $nosenjata, id_acara_dinas: $id_acara_dinas");
-
-    // Hapus data pengambilan dari tabel pengambilan berdasarkan nosenjata dan id_acara_dinas
-    $deleteQuery = "DELETE p FROM pengambilan p JOIN senjata s ON p.idsenjata = s.idsenjata WHERE s.nosenjata='$nosenjata' AND p.id_acara_dinas='$id_acara_dinas' LIMIT 1";
+if (isset($_POST['hapus_senjata'])) {
+    $id_pengambilan = $_POST['id_pengambilan'];
+    $deleteQuery = "DELETE FROM pengambilan WHERE id='$id_pengambilan' LIMIT 1";
     if (!mysqli_query($conn, $deleteQuery)) {
         echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
     } else {
         echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
+    }
+    exit();
+}
+
+if (isset($_POST['senjatakembali'])) {
+    $nosenjata = $_POST['nosenjata'];
+    $id_acara_dinas = $_POST['id_acara_dinas'];
+    $nama_peminjam = $_POST['nama_peminjam'];
+    $timestamp = $_POST['timestamp'];
+    $acara = $_POST['acara'];
+    $getIdQuery = "SELECT p.id FROM pengambilan p JOIN senjata s ON p.idsenjata = s.idsenjata JOIN mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa JOIN acara_dinas a ON p.id_acara_dinas = a.id_acara_dinas WHERE s.nosenjata='$nosenjata' AND p.id_acara_dinas='$id_acara_dinas' AND m.nama='$nama_peminjam' AND p.tanggal_waktu='$timestamp' AND a.nama_acara='$acara' LIMIT 1";
+    $result = mysqli_query($conn, $getIdQuery);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $id_pengambilan = $row['id'];
+        $deleteQuery = "DELETE FROM pengambilan WHERE id='$id_pengambilan' LIMIT 1";
+        if (!mysqli_query($conn, $deleteQuery)) {
+            echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
+        } else {
+            echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Record not found.']);
     }
     exit();
 }
@@ -62,7 +70,6 @@ if (isset($_POST['senjatakembali'])) {
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
             <a class="navbar-brand" href="index.php">Sistem Inventaris Senjata UNHAN RI</a>
-
         </nav>
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
@@ -96,14 +103,12 @@ if (isset($_POST['senjatakembali'])) {
                 <main>
                     <div class="container-fluid">
                         <h1 class="mt-4">Pengembalian Senjata</h1>
-
                         <div class="card mb-4">
                             <div class="card-header">
                                 <!-- Tombol untuk Membuka Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Pengembalian Senjata
                                 </button>
-
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -115,6 +120,7 @@ if (isset($_POST['senjatakembali'])) {
                                                 <th>Tanggal Keluar & Waktu Peminjaman</th>
                                                 <th>Peminjam</th>
                                                 <th>Acara</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody id="senjataTableBody">
@@ -126,13 +132,18 @@ if (isset($_POST['senjatakembali'])) {
                                                 $tanggal = $data['tanggal_waktu'];
                                                 $penerima = $data['penerima'];
                                                 $acara = $data['nama_acara'];
+                                                $id_acara_dinas = $data['id_acara_dinas'];
+                                                $id_pengambilan = $data['id'];
                                             ?>
-                                            <tr>
+                                            <tr data-id="<?=$id_pengambilan;?>" data-nosenjata="<?=$nosenjata;?>" data-tanggal="<?=$tanggal;?>" data-penerima="<?=$penerima;?>" data-acara="<?=$acara;?>">
                                                 <td><?=$i++;?></td>
                                                 <td><?=$nosenjata;?></td>
                                                 <td><?=$tanggal;?></td>
                                                 <td><?=$penerima;?></td>
                                                 <td><?=$acara;?></td>
+                                                <td class="text-center">
+                                                    <button class="btn btn-danger btn-sm delete-btn" data-id="<?=$id_pengambilan;?>">&times;</button>
+                                                </td>
                                             </tr>
                                             <?php
                                             };
@@ -168,12 +179,66 @@ if (isset($_POST['senjatakembali'])) {
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script>
             $(document).ready(function() {
-                $('#myModal form').on('submit', function(e) {
+                // Handle delete button click
+                $('.delete-btn').on('click', function() {
+                    if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                        let id_pengambilan = $(this).data('id');
+                        $.ajax({
+                            type: 'POST',
+                            url: 'kembali.php',
+                            data: { hapus_senjata: true, id_pengambilan: id_pengambilan },
+                            success: function(response) {
+                                let res = JSON.parse(response);
+                                if (res.status === 'success') {
+                                    alert(res.message);
+                                    location.reload(); // Reload the page to reflect changes
+                                } else {
+                                    alert(res.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                alert('An error occurred: ' + error);
+                            }
+                        });
+                    }
+                });
+
+                // Handle QR code scan
+                let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+                Instascan.Camera.getCameras().then(function(cameras) {
+                    if (cameras.length > 0) {
+                        scanner.start(cameras[0]);
+                    } else {
+                        alert('No cameras found');
+                    }
+                }).catch(function(e) {
+                    console.error(e);
+                });
+
+                scanner.addListener('scan', function(c) {
+                    // Assuming the QR code contains both nosenjata and id_acara_dinas separated by a comma
+                    let parts = c.split(',');
+                    document.getElementById('nosenjata').value = parts[0];
+                    document.getElementById('id_acara_dinas').value = parts[1];
+
+                    // Find the corresponding row and set the data-id attribute in the form
+                    $('#senjataTableBody tr').each(function() {
+                        if ($(this).data('nosenjata') === parts[0]) {
+                            $('#nama_peminjam').val($(this).data('penerima'));
+                            $('#timestamp').val($(this).data('tanggal'));
+                            $('#acara').val($(this).data('acara'));
+                            $('#kembaliForm').data('id', $(this).data('id'));
+                        }
+                    });
+                });
+
+                $('#submitBtn').on('click', function(e) {
                     e.preventDefault();
+                    let id_pengambilan = $('#kembaliForm').data('id');
                     $.ajax({
                         type: 'POST',
                         url: 'kembali.php',
-                        data: $(this).serialize(),
+                        data: { hapus_senjata: true, id_pengambilan: id_pengambilan },
                         success: function(response) {
                             let res = JSON.parse(response);
                             if (res.status === 'success') {
@@ -203,31 +268,18 @@ if (isset($_POST['senjatakembali'])) {
             </div>
             
             <!-- Body Modal -->
-            <form method="post">
+            <form method="post" id="kembaliForm">
                 <div class="modal-body">
-                    <p>Acara dan Dinas: <?= $id_acara_dinas ?></p>
                     <video id="preview" width="100%"></video>
                     <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
+                    <input type="hidden" name="id_acara_dinas" id="id_acara_dinas">
+                    <input type="text" name="nama_peminjam" id="nama_peminjam" placeholder="Nama Peminjam" class="form-control" readonly>
+                    <input type="text" name="timestamp" id="timestamp" placeholder="Tanggal & Waktu Peminjaman" class="form-control" readonly>
+                    <input type="text" name="acara" id="acara" placeholder="Acara" class="form-control" readonly>
                     <br>
-                    <button type="submit" class="btn btn-primary" name="senjatakembali" id="submitBtn">Hapus</button>
+                    <button type="submit" class="btn btn-danger" name="senjatakembali" id="submitBtn">Hapus</button>
                 </div>
             </form>
-            <script>
-            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-            Instascan.Camera.getCameras().then(function(cameras) {
-                if (cameras.length > 0) {
-                    scanner.start(cameras[0]);
-                } else {
-                    alert('No cameras found');
-                }
-            }).catch(function(e) {
-                console.error(e);
-            });
-
-            scanner.addListener('scan', function(c) {
-                document.getElementById('nosenjata').value = c;
-            });
-        </script>
         </div>
         </div>
     </div>
@@ -242,3 +294,41 @@ if (isset($_POST['senjatakembali'])) {
     });
 </script>
 </html>
+
+<?php
+include 'function.php';
+
+if (isset($_POST['hapus_senjata'])) {
+    $id_pengambilan = $_POST['id_pengambilan'];
+    $deleteQuery = "DELETE FROM pengambilan WHERE id='$id_pengambilan' LIMIT 1";
+    if (!mysqli_query($conn, $deleteQuery)) {
+        echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
+    } else {
+        echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
+    }
+    exit();
+}
+
+if (isset($_POST['senjatakembali'])) {
+    $nosenjata = $_POST['nosenjata'];
+    $id_acara_dinas = $_POST['id_acara_dinas'];
+    $nama_peminjam = $_POST['nama_peminjam'];
+    $timestamp = $_POST['timestamp'];
+    $acara = $_POST['acara'];
+    $getIdQuery = "SELECT p.id FROM pengambilan p JOIN senjata s ON p.idsenjata = s.idsenjata JOIN mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa JOIN acara_dinas a ON p.id_acara_dinas = a.id_acara_dinas WHERE s.nosenjata='$nosenjata' AND p.id_acara_dinas='$id_acara_dinas' AND m.nama='$nama_peminjam' AND p.tanggal_waktu='$timestamp' AND a.nama_acara='$acara' LIMIT 1";
+    $result = mysqli_query($conn, $getIdQuery);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $id_pengambilan = $row['id'];
+        $deleteQuery = "DELETE FROM pengambilan WHERE id='$id_pengambilan' LIMIT 1";
+        if (!mysqli_query($conn, $deleteQuery)) {
+            echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
+        } else {
+            echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Record not found.']);
+    }
+    exit();
+}
+?>
