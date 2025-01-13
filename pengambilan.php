@@ -22,10 +22,20 @@ if (isset($_POST['senjatakeluar'])) {
 
     // Ambil idsenjata berdasarkan nosenjata
     $senjataQuery = mysqli_query($conn, "SELECT idsenjata FROM senjata WHERE nosenjata='$nosenjata'");
+    if (!$senjataQuery) {
+        die("Query failed: " . mysqli_error($conn));
+    }
     $senjataData = mysqli_fetch_array($senjataQuery);
     $idsenjata = $senjataData['idsenjata'];
 
-
+    if ($idsenjata) {
+        
+        // Redirect to prevent form resubmission
+        echo "<script>window.location.href='pengambilan.php';</script>";
+        exit();
+    } else {
+        die("Senjata dengan nomor $nosenjata tidak ditemukan.");
+    }
 }
 ?>
 
@@ -67,7 +77,11 @@ if (isset($_POST['senjatakeluar'])) {
                             </a>
                             <a class="nav-link" href="pengambilan.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Pengambilan Senjata
+                                Peminjaman Senjata
+                            </a>
+                            <a class="nav-link" href="kembali.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Pengembalian Senjata
                             </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
@@ -79,13 +93,13 @@ if (isset($_POST['senjatakeluar'])) {
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
-                        <h1 class="mt-4">Pengambilan Senjata</h1>
+                        <h1 class="mt-4">Peminjaman Senjata</h1>
 
                         <div class="card mb-4">
                             <div class="card-header">
                                 <!-- Tombol untuk Membuka Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                                    Pengambilan Senjata
+                                    Peminjaman Senjata
                                 </button>
                                 <!-- Tombol untuk Kembali ke Acara Dinas -->
                                 <a href="acara_dinas.php" class="btn btn-secondary">Kembali ke Acara Dinas</a>

@@ -1,18 +1,55 @@
 <?php
 require 'function.php';
 require 'cek.php';
-require_once("assets/phpqrcode/qrlib.php");
+
+// Set the default timezone to match the local time on the laptop
+date_default_timezone_set('Asia/Jakarta'); // Adjust the timezone as needed
+
+// Check database connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Ambil daftar mahasiswa
+$mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
+
+// Periksa apakah acara dan dinas sudah disetel dalam sesi
+if (!isset($_SESSION['id_acara_dinas'])) {
+    // Alihkan ke halaman acara_dinas jika belum disetel
+    header("Location: acara_dinas.php");
+    exit();
+}
+
+$id_acara_dinas = $_SESSION['id_acara_dinas'];
+
+// Proses pengembalian senjata
+if (isset($_POST['senjatakembali'])) {
+    $nosenjata = $_POST['nosenjata'];
+    $tanggal_waktu = date('Y-m-d H:i:s');
+
+    // Debugging: Check the values of nosenjata and id_acara_dinas
+    error_log("nosenjata: $nosenjata, id_acara_dinas: $id_acara_dinas");
+
+    // Hapus data pengambilan dari tabel pengambilan berdasarkan nosenjata dan id_acara_dinas
+    $deleteQuery = "DELETE p FROM pengambilan p JOIN senjata s ON p.idsenjata = s.idsenjata WHERE s.nosenjata='$nosenjata' AND p.id_acara_dinas='$id_acara_dinas' LIMIT 1";
+    if (!mysqli_query($conn, $deleteQuery)) {
+        echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
+    } else {
+        echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
+    }
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Inventaris Senjata</title>
+        <title>Pengembalian Senjata</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
@@ -28,7 +65,7 @@ require_once("assets/phpqrcode/qrlib.php");
 
         </nav>
         <div id="layoutSidenav">
-        <div id="layoutSidenav_nav">
+            <div id="layoutSidenav_nav">
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
@@ -58,14 +95,15 @@ require_once("assets/phpqrcode/qrlib.php");
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
-                        <h1 class="mt-4">Inventaris Senjata</h1>
+                        <h1 class="mt-4">Pengembalian Senjata</h1>
 
                         <div class="card mb-4">
                             <div class="card-header">
-                                <!-- Button to Open the Modal -->
+                                <!-- Tombol untuk Membuka Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                                    Tambah Senjata
+                                    Pengembalian Senjata
                                 </button>
+
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -74,35 +112,27 @@ require_once("assets/phpqrcode/qrlib.php");
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nomor Senjata</th>
-                                                <th>Keterangan</th>
-                                                <th>QR Code</th>
+                                                <th>Tanggal Keluar & Waktu Peminjaman</th>
+                                                <th>Peminjam</th>
+                                                <th>Acara</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="senjataTableBody">
                                             <?php
-                                            $ambildatasenjata = mysqli_query($conn, "select * from senjata");
+                                            $ambildatasenjata = mysqli_query($conn, "SELECT p.*, s.nosenjata, m.nama as penerima, a.nama_acara FROM pengambilan p JOIN senjata s ON s.idsenjata = p.idsenjata JOIN mahasiswa m ON m.id_mahasiswa = p.id_mahasiswa JOIN acara_dinas a ON a.id_acara_dinas = p.id_acara_dinas");
                                             $i = 1;
                                             while($data=mysqli_fetch_array($ambildatasenjata)){
-                                                
                                                 $nosenjata = $data['nosenjata'];
-                                                $keterangan = $data['keterangan'];
-                                                
-                                                // Generate QR code
-                                                $fileName = "qrcodes/" . $nosenjata . ".png";
-                                                QRcode::png($nosenjata, $fileName, "H", 4, 4);
-
-                                                // Save QR code file name in the database
-                                                $updateQuery = "UPDATE senjata SET kodeqr='$fileName' WHERE nosenjata='$nosenjata'";
-                                                mysqli_query($conn, $updateQuery);
+                                                $tanggal = $data['tanggal_waktu'];
+                                                $penerima = $data['penerima'];
+                                                $acara = $data['nama_acara'];
                                             ?>
                                             <tr>
                                                 <td><?=$i++;?></td>
                                                 <td><?=$nosenjata;?></td>
-                                                <td><?=$keterangan;?></td>
-                                                <td>
-                                                    <img src="<?=$fileName;?>" alt="QR Code">
-                                                </td>
-
+                                                <td><?=$tanggal;?></td>
+                                                <td><?=$penerima;?></td>
+                                                <td><?=$acara;?></td>
                                             </tr>
                                             <?php
                                             };
@@ -128,8 +158,7 @@ require_once("assets/phpqrcode/qrlib.php");
                 </footer>
             </div>
         </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/scripts.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
@@ -137,31 +166,79 @@ require_once("assets/phpqrcode/qrlib.php");
         <script src="assets/demo/chart-bar-demo.js"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
-        <script src="assets/demo/datatables-demo.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#myModal form').on('submit', function(e) {
+                    e.preventDefault();
+                    $.ajax({
+                        type: 'POST',
+                        url: 'kembali.php',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            let res = JSON.parse(response);
+                            if (res.status === 'success') {
+                                alert(res.message);
+                                location.reload(); // Reload the page to reflect changes
+                            } else {
+                                alert(res.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('An error occurred: ' + error);
+                        }
+                    });
+                });
+            });
+        </script>
     </body>
-        <!-- The Modal -->
+    <!-- Modal -->
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
-            <div class="modal-content">
-            
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Tambah Senjata</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                
-                <!-- Modal body -->
-                <form method="post">
-                    <div class="modal-body">
-                        <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
-                        <br> 
-                        <input type="text" name="keterangan" placeholder="Keterangan senjata" class="form-control" required>
-                        <br>
-                        <button type="submit" class="btn btn-primary" name="addsenjata">Submit</button>
-                    </div>
-                </form>
+        <div class="modal-content">
+        
+            <!-- Header Modal -->
+            <div class="modal-header">
+                <h4 class="modal-title">Pengembalian Senjata</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;"></button>
             </div>
+            
+            <!-- Body Modal -->
+            <form method="post">
+                <div class="modal-body">
+                    <p>Acara dan Dinas: <?= $id_acara_dinas ?></p>
+                    <video id="preview" width="100%"></video>
+                    <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
+                    <br>
+                    <button type="submit" class="btn btn-primary" name="senjatakembali" id="submitBtn">Hapus</button>
+                </div>
+            </form>
+            <script>
+            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+            Instascan.Camera.getCameras().then(function(cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    alert('No cameras found');
+                }
+            }).catch(function(e) {
+                console.error(e);
+            });
+
+            scanner.addListener('scan', function(c) {
+                document.getElementById('nosenjata').value = c;
+            });
+        </script>
+        </div>
         </div>
     </div>
-  
+
+<!-- Sertakan pustaka Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Inisialisasi Select2 untuk dropdown
+        $('#penerimaDropdown').select2();
+    });
+</script>
 </html>
