@@ -2,6 +2,9 @@
 require 'function.php';
 require 'cek.php';
 
+// Set the default timezone to UTC+7 (Bangkok, Hanoi, Jakarta)
+date_default_timezone_set('Asia/Jakarta');
+
 // Ambil daftar mahasiswa
 $mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
 
@@ -18,7 +21,7 @@ $id_acara_dinas = $_SESSION['id_acara_dinas'];
 if (isset($_POST['senjatakeluar'])) {
     $nosenjata = $_POST['nosenjata'];
     $id_mahasiswa = $_POST['penerima'];
-    $tanggal_waktu = date('Y-m-d H:i:s');
+    $tanggal_waktu = date('Y-m-d H:i:s', strtotime('+6 hours'));
 
     // Ambil idsenjata berdasarkan nosenjata
     $senjataQuery = mysqli_query($conn, "SELECT idsenjata FROM senjata WHERE nosenjata='$nosenjata'");
@@ -59,7 +62,11 @@ if (isset($_POST['senjatakeluar'])) {
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-            <a class="navbar-brand" href="index.php">SENJA-TA</a>
+            <a class="navbar-brand" href="index.php">
+                <img src="assets/img/Logo_Unhan.png" alt="Logo Unhan" style="height: 30px; margin-right: 10px;">
+                SENJA-TA
+            </a>
+
         </nav>
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
@@ -67,11 +74,11 @@ if (isset($_POST['senjatakeluar'])) {
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <a class="nav-link" href="index.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Data Senjata
                             </a>
                             <a class="nav-link" href="mahasiswa.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Data Mahasiswa
                             </a>
                             <a class="nav-link" href="pengambilan.php">

@@ -69,7 +69,10 @@ if (isset($_POST['senjatakembali'])) {
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-            <a class="navbar-brand" href="index.php">SENJA-TA</a>
+            <a class="navbar-brand" href="index.php">
+                <img src="assets/img/Logo_Unhan.png" alt="Logo Unhan" style="height: 30px; margin-right: 10px;">
+                SENJA-TA
+            </a>
         </nav>
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">

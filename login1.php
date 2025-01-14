@@ -70,7 +70,10 @@ if(isset($_POST['login'])){
                             <div class="col-lg-5">
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header text-center">
-                                        <h3 class="text-center font-weight-light my-4">Login Admin</h3>
+                                        <img src="assets/img/Logo_Unhan.png" alt="Logo Unhan" style="height: 120px;">
+                                        <h3 class="text-center font-weight-light my-4">
+                                            <strong>Login Admin</strong>
+                                        </h3>
                                     </div>
                                     <div class="card-body">
                                         <form method="post">
@@ -82,7 +85,7 @@ if(isset($_POST['login'])){
                                                 <label class="small mb-1" for="inputPassword">Password</label>
                                                 <input class="form-control py-4" name="password" id="inputPassword" type="password" placeholder="Enter password" required />
                                             </div>
-                                            <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
+                                            <div class="form-group d-flex align-items-center justify-content-center mt-4 mb-0">
                                                 <button class="btn btn-primary" name="login">Login</button>
                                             </div>
                                         </form>
