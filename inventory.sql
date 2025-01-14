@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 14, 2025 at 05:13 AM
+-- Generation Time: Jan 14, 2025 at 04:53 PM
 -- Server version: 10.4.28-MariaDB-log
 -- PHP Version: 8.2.4
 
@@ -49,7 +49,15 @@ INSERT INTO `acara_dinas` (`id_acara_dinas`, `nama_acara`, `jenis_dinas`) VALUES
 (22, 'HUT TNI', 'Luar'),
 (23, 'HALIM', 'Luar'),
 (24, 'KEMHAN', 'Luar'),
-(25, 'MONAS', 'Luar');
+(25, 'MONAS', 'Luar'),
+(26, 'HUT TNI', 'Luar'),
+(27, 'HUT TNI', 'Luar'),
+(28, 'KEMHAN', 'Luar'),
+(29, 'HUT TNI', 'Luar'),
+(30, 'KEMHAN', 'Luar'),
+(31, 'HUT TNI', 'Luar'),
+(32, 'HALIM', 'Luar'),
+(33, 'HUT TNI', 'Luar');
 
 -- --------------------------------------------------------
 
@@ -69,6 +77,25 @@ CREATE TABLE `login` (
 
 INSERT INTO `login` (`iduser`, `email`, `password`) VALUES
 (1, 'admin@idu.ac.id', '12345678');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loginmhsw`
+--
+
+CREATE TABLE `loginmhsw` (
+  `idusermhsw` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `loginmhsw`
+--
+
+INSERT INTO `loginmhsw` (`idusermhsw`, `email`, `password`) VALUES
+(1, 'iqbal.setyawan@tm.idu.ac.id', '12345678');
 
 -- --------------------------------------------------------
 
@@ -98,7 +125,8 @@ INSERT INTO `mahasiswa` (`id_mahasiswa`, `nim`, `nama`, `prodi`, `kodeqr`) VALUE
 (13, '32024204158', 'Achmad Sufa Ramdlani Al Kindi', 'Farmasi', 'qrcodes/32024204158.png'),
 (14, '3232940219', 'Khaerul Imam Phatoni', 'Informatika', 'qrcodes/3232940219.png'),
 (15, '32022010421', 'Aziz Al Qadri Setyawan', 'Kedokteran', 'qrcodes/32022010421.png'),
-(16, '322320302', 'Rafi Ahmad Naufal', 'Teknik Sipil', 'qrcodes/322320302.png');
+(16, '322320302', 'Rafi Ahmad Naufal', 'Teknik Sipil', 'qrcodes/322320302.png'),
+(17, '320230403010', 'Jonathan Rico Petruska Ginting', 'Teknik Mesin', NULL);
 
 -- --------------------------------------------------------
 
@@ -127,7 +155,14 @@ INSERT INTO `pengambilan` (`id`, `idsenjata`, `tanggal_waktu`, `id_mahasiswa`, `
 (65, 35, '2025-01-13 20:10:35', '14', 24),
 (66, 38, '2025-01-13 20:10:46', '16', 24),
 (67, 39, '2025-01-13 20:10:55', '11', 24),
-(68, 40, '2025-01-13 20:11:12', '12', 25);
+(68, 40, '2025-01-13 20:11:12', '12', 25),
+(71, 26, '2025-01-14 09:32:09', '8', 33),
+(72, 26, '2025-01-14 09:32:55', '6', 33),
+(73, 26, '2025-01-14 09:39:05', '6', 33),
+(74, 26, '2025-01-14 09:41:26', '6', 33),
+(75, 26, '2025-01-14 09:43:02', '6', 33),
+(76, 26, '2025-01-14 09:45:34', '6', 33),
+(77, 26, '2025-01-14 09:47:04', '8', 33);
 
 -- --------------------------------------------------------
 
@@ -162,7 +197,8 @@ INSERT INTO `senjata` (`idsenjata`, `nosenjata`, `keterangan`, `kodeqr`) VALUES
 (44, '00003432', 'G6-Combat', 'qrcodes/00003432.png'),
 (45, '00003543', 'G6-Combat', 'qrcodes/00003543.png'),
 (46, '00004649', 'G6-Combat', 'qrcodes/00004649.png'),
-(47, '00008695', 'G6-Combat', 'qrcodes/00008695.png');
+(47, '00008695', 'G6-Combat', 'qrcodes/00008695.png'),
+(48, '00003245', 'SS2-V5', 'qrcodes/00003245.png');
 
 --
 -- Indexes for dumped tables
@@ -179,6 +215,12 @@ ALTER TABLE `acara_dinas`
 --
 ALTER TABLE `login`
   ADD PRIMARY KEY (`iduser`);
+
+--
+-- Indexes for table `loginmhsw`
+--
+ALTER TABLE `loginmhsw`
+  ADD PRIMARY KEY (`idusermhsw`);
 
 --
 -- Indexes for table `mahasiswa`
@@ -210,7 +252,7 @@ ALTER TABLE `senjata`
 -- AUTO_INCREMENT for table `acara_dinas`
 --
 ALTER TABLE `acara_dinas`
-  MODIFY `id_acara_dinas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_acara_dinas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `login`
@@ -219,22 +261,28 @@ ALTER TABLE `login`
   MODIFY `iduser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `loginmhsw`
+--
+ALTER TABLE `loginmhsw`
+  MODIFY `idusermhsw` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id_mahasiswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_mahasiswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `pengambilan`
 --
 ALTER TABLE `pengambilan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `senjata`
 --
 ALTER TABLE `senjata`
-  MODIFY `idsenjata` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `idsenjata` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- Constraints for dumped tables
