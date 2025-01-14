@@ -2,6 +2,28 @@
 require 'function.php';
 require 'cek.php';
 require_once("assets/phpqrcode/qrlib.php");
+
+if(isset($_POST['uploadcsvsenjata'])){
+    $file = $_FILES['csvfile']['tmp_name'];
+    $handle = fopen($file, "r");
+    while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
+        $nosenjata = $data[0];
+        $keterangan = $data[1];
+
+        // Save data to database
+        $query = "INSERT INTO senjata (nosenjata, keterangan) VALUES ('$nosenjata', '$keterangan')";
+        mysqli_query($conn, $query);
+
+        // Generate QR code
+        $fileName = "qrcodes/" . $nosenjata . ".png";
+        QRcode::png($nosenjata, $fileName, "H", 4, 4);
+
+        // Save QR code file name in the database
+        $updateQuery = "UPDATE senjata SET kodeqr='$fileName' WHERE nosenjata='$nosenjata'";
+        mysqli_query($conn, $updateQuery);
+    }
+    fclose($handle);
+}
 ?>
 
 <!DOCTYPE html>
@@ -73,6 +95,9 @@ require_once("assets/phpqrcode/qrlib.php");
                                     Tambah Senjata
                                 </button>
                                 <!-- Button to Open the CSV Modal -->
+                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#csvModalSenjata">
+                                    Tambah Senjata via CSV
+                                </button>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">

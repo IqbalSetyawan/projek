@@ -30,6 +30,43 @@ $totalQuery = "
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult);
 $totalBorrowed = $totalRow['total_borrowed'];
+
+if (isset($_POST['cetak_laporan'])) {
+    $fpdfPath = 'library/fpdf.php';
+    if (file_exists($fpdfPath)) {
+        require($fpdfPath);
+
+        $pdf = new FPDF('P', 'mm', 'A4');
+        $pdf->AddPage();
+
+        $pdf->SetFont('Times', 'B', 13);
+        $pdf->Cell(200, 10, 'DATA LAPORAN PEMINJAMAN SENJATA', 0, 0, 'C');
+
+        $pdf->Cell(10, 15, '', 0, 1);
+        $pdf->SetFont('Times', 'B', 9);
+        $pdf->Cell(10, 7, 'NO', 1, 0, 'C');
+        $pdf->Cell(50, 7, 'NAMA ACARA', 1, 0, 'C');
+        $pdf->Cell(50, 7, 'JENIS DINAS', 1, 0, 'C');
+        $pdf->Cell(50, 7, 'JENIS SENJATA', 1, 0, 'C');
+        $pdf->Cell(30, 7, 'JUMLAH DIPINJAM', 1, 1, 'C');
+
+        $pdf->SetFont('Times', '', 10);
+        $no = 1;
+        $data = mysqli_query($conn, $query);
+        while ($row = mysqli_fetch_array($data)) {
+            $pdf->Cell(10, 6, $no++, 1, 0, 'C');
+            $pdf->Cell(50, 6, $row['nama_acara'], 1, 0);
+            $pdf->Cell(50, 6, $row['jenis_dinas'], 1, 0);
+            $pdf->Cell(50, 6, $row['jenis_senjata'], 1, 0);
+            $pdf->Cell(30, 6, $row['total_borrowed'], 1, 1);
+        }
+
+        $pdf->Output();
+        exit();
+    } else {
+        echo "Library FPDF tidak ditemukan.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -45,10 +82,7 @@ $totalBorrowed = $totalRow['total_borrowed'];
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-        <a class="navbar-brand" href="index.php">
-                <img src="assets/img/Logo_Unhan.png" alt="Logo Unhan" style="height: 30px; margin-right: 10px;">
-                SENJA-TA
-            </a>
+        <a class="navbar-brand" href="index.php">SENJA-TA</a>
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -124,7 +158,9 @@ $totalBorrowed = $totalRow['total_borrowed'];
                                     </tfoot>
                                 </table>
                             </div>
-                            <button id="printButton" onclick="printReport()" class="btn btn-primary mt-3">Cetak Laporan</button>
+                            <form method="post">
+                                <button type="submit" id="printButton" name="cetak_laporan" class="btn btn-primary mt-3">Cetak Laporan</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -152,18 +188,5 @@ $totalBorrowed = $totalRow['total_borrowed'];
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
     <script src="assets/demo/datatables-demo.js"></script>
-    <script>
-        function printReport() {
-            var printButton = document.getElementById('printButton');
-            printButton.style.display = 'none';
-            var printContents = document.querySelector('.card-body').innerHTML;
-            var originalContents = document.body.innerHTML;
-
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-            location.reload();
-        }
-    </script>
 </body>
 </html>
