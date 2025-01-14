@@ -16,6 +16,25 @@ if(isset($_POST['addmahasiswa'])){
     $query = "INSERT INTO mahasiswa (nim, nama, prodi, kodeqr) VALUES ('$nim', '$nama', '$prodi', '$fileName')";
     mysqli_query($conn, $query);
 }
+
+if(isset($_POST['uploadcsv'])){
+    $file = $_FILES['csvfile']['tmp_name'];
+    $handle = fopen($file, "r");
+    while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
+        $nim = $data[0];
+        $nama = $data[1];
+        $prodi = $data[2];
+
+        // Generate QR code
+        $fileName = "qrcodes/" . $nim . ".png";
+        QRcode::png($nim, $fileName, "H", 4, 4);
+
+        // Save data to database
+        $query = "INSERT INTO mahasiswa (nim, nama, prodi, kodeqr) VALUES ('$nim', '$nama', '$prodi', '$fileName')";
+        mysqli_query($conn, $query);
+    }
+    fclose($handle);
+}
 ?>
 
 <!DOCTYPE html>
@@ -78,6 +97,10 @@ if(isset($_POST['addmahasiswa'])){
                                 <!-- Button to Open the Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Tambah Mahasiswa
+                                </button>
+                                <!-- Button to Open the CSV Modal -->
+                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#csvModal">
+                                    Tambah Mahasiswa via CSV
                                 </button>
                             </div>
                             <div class="card-body">
@@ -180,5 +203,24 @@ if(isset($_POST['addmahasiswa'])){
             </div>
         </div>
     </div>
-  
+    <!-- The CSV Modal -->
+    <div class="modal fade" id="csvModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Tambah Mahasiswa via CSV</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <form method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="file" name="csvfile" class="form-control" required>
+                        <br>
+                        <button type="submit" class="btn btn-primary" name="uploadcsv">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </html>
