@@ -28,14 +28,19 @@ if (isset($_POST['senjatakeluar'])) {
     // Ambil idsenjata berdasarkan nosenjata
     $senjataQuery = mysqli_query($conn, "SELECT idsenjata FROM senjata WHERE nosenjata='$nosenjata'");
     $senjataData = mysqli_fetch_array($senjataQuery);
-    $idsenjata = $senjataData['idsenjata'];
+    $idsenjata = $senjataData['idsenjata'] ?? null;
 
-    // Simpan data pengambilan ke dalam tabel pengambilan
-    $insertQuery = "INSERT INTO pengambilan (idsenjata, tanggal_waktu, id_mahasiswa, id_acara_dinas) VALUES ('$idsenjata', '$tanggal_waktu', '$id_mahasiswa', '$id_acara_dinas')";
-    if (mysqli_query($conn, $insertQuery)) {
-        header('Location: pengambilan.php');
+    if ($idsenjata) {
+        // Simpan data pengambilan ke dalam tabel pengambilan
+        $insertQuery = "INSERT INTO pengambilan (idsenjata, tanggal_waktu, id_mahasiswa, id_acara_dinas) VALUES ('$idsenjata', '$tanggal_waktu', '$id_mahasiswa', '$id_acara_dinas')";
+        if (mysqli_query($conn, $insertQuery)) {
+            header('Location: pengambilan.php');
+        } else {
+            echo 'Gagal: ' . mysqli_error($conn);
+            header('Location: pengambilan.php');
+        }
     } else {
-        echo 'Gagal';
+        echo 'Senjata dengan nomor ' . $nosenjata . ' tidak ditemukan.';
         header('Location: pengambilan.php');
     }
 }
@@ -71,6 +76,21 @@ function deletePengambilan($nosenjata, $id_acara_dinas) {
     } else {
         error_log("Record not found for nosenjata: $nosenjata, id_acara_dinas: $id_acara_dinas"); // Log the error
         return ['status' => 'error', 'message' => 'Record not found.'];
+    }
+}
+
+// Fungsi login mahasiswa
+function loginMahasiswa($email, $password) {
+    global $conn;
+
+    $cekdatabase = mysqli_query($conn, "SELECT * FROM loginmhsw WHERE email='$email' AND password='$password'");
+    $hitung = mysqli_num_rows($cekdatabase);
+
+    if ($hitung > 0) {
+        $_SESSION['log'] = 'True';
+        return true;
+    } else {
+        return false;
     }
 }
 ?>

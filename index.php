@@ -70,9 +70,6 @@ require_once("assets/phpqrcode/qrlib.php");
                                     Tambah Senjata
                                 </button>
                                 <!-- Button to Open the CSV Modal -->
-                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#csvModalSenjata">
-                                    Tambah Senjata via CSV
-                                </button>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">

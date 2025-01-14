@@ -1,19 +1,16 @@
 <?php
 require 'function.php';
 
+
 if(isset($_POST['login'])){
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $cekdatabase = mysqli_query($conn, "SELECT * FROM login WHERE email='$email' AND password='$password'");
-    $hitung = mysqli_num_rows($cekdatabase);
-
-    if($hitung > 0){
-        $_SESSION['log'] = 'True';
-        $_SESSION['role'] = 'admin'; // Set session role to admin
-        header('location:index.php');
+    if (loginMahasiswa($email, $password)) {
+        $_SESSION['role'] = 'mahasiswa'; // Set session role to mahasiswa
+        header('location:cari.php');
     } else {
-        header('location:login1.php');
+        header('location:login2.php');
     }
 }
 ?>
@@ -70,7 +67,7 @@ if(isset($_POST['login'])){
                             <div class="col-lg-5">
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header text-center">
-                                        <h3 class="text-center font-weight-light my-4">Login Admin</h3>
+                                        <h3 class="text-center font-weight-light my-4">Login Mahasiswa</h3>
                                     </div>
                                     <div class="card-body">
                                         <form method="post">
@@ -88,7 +85,7 @@ if(isset($_POST['login'])){
                                         </form>
                                     </div>
                                     <div class="card-footer text-center">
-                                        <div class="small"><a href="login2.php">Masuk sebagai mahasiswa</a></div>
+                                        <div class="small"><a href="login1.php">Masuk sebagai admin</a></div>
                                     </div>
                                 </div>
                             </div>
