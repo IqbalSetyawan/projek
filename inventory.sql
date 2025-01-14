@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 12, 2025 at 09:38 AM
+-- Generation Time: Jan 14, 2025 at 05:13 AM
 -- Server version: 10.4.28-MariaDB-log
 -- PHP Version: 8.2.4
 
@@ -38,9 +38,18 @@ CREATE TABLE `acara_dinas` (
 --
 
 INSERT INTO `acara_dinas` (`id_acara_dinas`, `nama_acara`, `jenis_dinas`) VALUES
-(9, 'HUT TNI', 'Luar'),
-(10, 'HUT TNI', 'Luar'),
-(11, 'MONAS', 'Luar');
+(14, 'HALIM', 'Luar'),
+(15, 'PANGLIMA CHINA', 'Dalam'),
+(16, 'HUT TNI', 'Luar'),
+(17, 'HUT TNI', 'Luar'),
+(18, 'HUT TNI', 'Luar'),
+(19, 'PANGLIMA CHINA', 'Dalam'),
+(20, 'KEMHAN', 'Luar'),
+(21, 'HUT TNI', 'Luar'),
+(22, 'HUT TNI', 'Luar'),
+(23, 'HALIM', 'Luar'),
+(24, 'KEMHAN', 'Luar'),
+(25, 'MONAS', 'Luar');
 
 -- --------------------------------------------------------
 
@@ -80,11 +89,16 @@ CREATE TABLE `mahasiswa` (
 --
 
 INSERT INTO `mahasiswa` (`id_mahasiswa`, `nim`, `nama`, `prodi`, `kodeqr`) VALUES
-(1, '320220401005', 'Ilham', 'informatika', 'qrcodes/320220401005.png'),
-(2, '320220401016', 'Fadhil', 'Informatika', 'qrcodes/320220401016.png'),
-(3, '320220401015', 'Zammy', 'Biologi', 'qrcodes/320220401015.png'),
-(4, '320220401002', 'jere', 'Matematika', 'qrcodes/320220401002.png'),
-(5, '3202202040223', 'Rizal', 'Teknik Elektro', 'qrcodes/3202202040223.png');
+(6, '3203034543', 'Muhammad Iqbal Setyawan', 'Informatika', 'qrcodes/3203034543.png'),
+(8, '3202204238', 'Muhammad Fadhil Diandra', 'Informatika', 'qrcodes/3202204238.png'),
+(9, '320220101535', 'Jeremia Paskah Putra Sinaga', 'Informatika', 'qrcodes/320220101535.png'),
+(10, '320220401041', 'Ida Bagus Aditya Nugraha', 'Kedokteran', 'qrcodes/320220401041.png'),
+(11, '3203304014', 'Leander Berliano Farel Kristiyono', 'Teknik Mesin', 'qrcodes/3203304014.png'),
+(12, '32329309241', 'Damar Adhiwidya Suyanto', 'Fisika', 'qrcodes/32329309241.png'),
+(13, '32024204158', 'Achmad Sufa Ramdlani Al Kindi', 'Farmasi', 'qrcodes/32024204158.png'),
+(14, '3232940219', 'Khaerul Imam Phatoni', 'Informatika', 'qrcodes/3232940219.png'),
+(15, '32022010421', 'Aziz Al Qadri Setyawan', 'Kedokteran', 'qrcodes/32022010421.png'),
+(16, '322320302', 'Rafi Ahmad Naufal', 'Teknik Sipil', 'qrcodes/322320302.png');
 
 -- --------------------------------------------------------
 
@@ -105,8 +119,15 @@ CREATE TABLE `pengambilan` (
 --
 
 INSERT INTO `pengambilan` (`id`, `idsenjata`, `tanggal_waktu`, `id_mahasiswa`, `id_acara_dinas`) VALUES
-(33, 19, '2025-01-12 02:34:23', '3', 10),
-(34, 17, '2025-01-12 02:36:13', '4', 11);
+(60, 26, '2025-01-13 20:09:41', '15', 23),
+(61, 27, '2025-01-13 20:09:51', '6', 23),
+(62, 31, '2025-01-13 20:09:58', '8', 23),
+(63, 33, '2025-01-13 20:10:12', '10', 24),
+(64, 34, '2025-01-13 20:10:24', '13', 24),
+(65, 35, '2025-01-13 20:10:35', '14', 24),
+(66, 38, '2025-01-13 20:10:46', '16', 24),
+(67, 39, '2025-01-13 20:10:55', '11', 24),
+(68, 40, '2025-01-13 20:11:12', '12', 25);
 
 -- --------------------------------------------------------
 
@@ -126,11 +147,22 @@ CREATE TABLE `senjata` (
 --
 
 INSERT INTO `senjata` (`idsenjata`, `nosenjata`, `keterangan`, `kodeqr`) VALUES
-(17, '00003789', 'Senapan', 'qrcodes/00003789.png'),
-(18, '00003790', 'Senapan', 'qrcodes/00003790.png'),
-(19, '00003791', 'Senapan', 'qrcodes/00003791.png'),
-(20, '00003792', 'Senapan', 'qrcodes/00003792.png'),
-(22, '00008682', 'Senapan', 'qrcodes/00008682.png');
+(26, '00003789', 'SS2-V5', 'qrcodes/00003789.png'),
+(27, '00004354', 'SS2-V5', 'qrcodes/00004354.png'),
+(31, '00008753', 'SS2-V5', 'qrcodes/00008753.png'),
+(33, '00003791', 'SS2-V5', 'qrcodes/00003791.png'),
+(34, '0002324', 'SS2-V5', 'qrcodes/0002324.png'),
+(35, '00009878', 'SS2-V5', 'qrcodes/00009878.png'),
+(38, '00003532', 'SS2-V5', 'qrcodes/00003532.png'),
+(39, '00002424', 'SS2-V5', 'qrcodes/00002424.png'),
+(40, '00007578', 'SS2-V5', 'qrcodes/00007578.png'),
+(41, '00003342', 'SS2-V5', 'qrcodes/00003342.png'),
+(42, '00005768', 'G6-Combat', 'qrcodes/00005768.png'),
+(43, '00003243', 'G6-Combat', 'qrcodes/00003243.png'),
+(44, '00003432', 'G6-Combat', 'qrcodes/00003432.png'),
+(45, '00003543', 'G6-Combat', 'qrcodes/00003543.png'),
+(46, '00004649', 'G6-Combat', 'qrcodes/00004649.png'),
+(47, '00008695', 'G6-Combat', 'qrcodes/00008695.png');
 
 --
 -- Indexes for dumped tables
@@ -178,7 +210,7 @@ ALTER TABLE `senjata`
 -- AUTO_INCREMENT for table `acara_dinas`
 --
 ALTER TABLE `acara_dinas`
-  MODIFY `id_acara_dinas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_acara_dinas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `login`
@@ -190,19 +222,19 @@ ALTER TABLE `login`
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id_mahasiswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_mahasiswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `pengambilan`
 --
 ALTER TABLE `pengambilan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `senjata`
 --
 ALTER TABLE `senjata`
-  MODIFY `idsenjata` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `idsenjata` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- Constraints for dumped tables
