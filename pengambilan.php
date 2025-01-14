@@ -68,11 +68,11 @@ if (isset($_POST['senjatakeluar'])) {
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <a class="nav-link" href="index.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Data Senjata
                             </a>
                             <a class="nav-link" href="mahasiswa.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Data Mahasiswa
                             </a>
                             <a class="nav-link" href="pengambilan.php">
@@ -82,6 +82,10 @@ if (isset($_POST['senjatakeluar'])) {
                             <a class="nav-link" href="kembali.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Pengembalian Senjata
+                            </a>
+                            <a class="nav-link" href="laporan.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
+                                Cetak Laporan
                             </a>
                             <a class="nav-link" href="logout.php">
                                 Logout

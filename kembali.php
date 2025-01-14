@@ -92,6 +92,10 @@ if (isset($_POST['senjatakembali'])) {
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Pengembalian Senjata
                             </a>
+                            <a class="nav-link" href="laporan.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
+                                Cetak Laporan
+                            </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
                             </a>
