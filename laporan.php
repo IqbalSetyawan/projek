@@ -61,10 +61,15 @@ if (isset($_POST['cetak_laporan'])) {
             $pdf->Cell(30, 6, $row['total_borrowed'], 1, 1);
         }
 
+        // Tambahkan total keseluruhan senjata yang dipinjam
+        $pdf->SetFont('Times', 'B', 9);
+        $pdf->Cell(160, 6, 'Total Senjata Dipinjam', 1, 0, 'C');
+        $pdf->Cell(30, 6, $totalBorrowed, 1, 1, 'C');
+
         $pdf->Output();
         exit();
     } else {
-        echo "Library FPDF tidak ditemukan.";
+        echo "<script>alert('Library FPDF tidak ditemukan. Pastikan library sudah diinstal.');</script>";
     }
 }
 ?>
