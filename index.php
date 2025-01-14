@@ -24,7 +24,7 @@ require_once("assets/phpqrcode/qrlib.php");
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-            <a class="navbar-brand" href="index.php">Sistem Inventaris Senjata UNHAN RI</a>
+            <a class="navbar-brand" href="index.php">SENJA-TA</a>
 
         </nav>
         <div id="layoutSidenav">
@@ -48,6 +48,10 @@ require_once("assets/phpqrcode/qrlib.php");
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Pengembalian Senjata
                             </a>
+                            <a class="nav-link" href="laporan.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
+                                Cetak Laporan
+                            </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
                             </a>
@@ -65,6 +69,10 @@ require_once("assets/phpqrcode/qrlib.php");
                                 <!-- Button to Open the Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Tambah Senjata
+                                </button>
+                                <!-- Button to Open the CSV Modal -->
+                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#csvModalSenjata">
+                                    Tambah Senjata via CSV
                                 </button>
                             </div>
                             <div class="card-body">
@@ -162,6 +170,26 @@ require_once("assets/phpqrcode/qrlib.php");
                         </select>
                         <br>
                         <button type="submit" class="btn btn-primary" name="addsenjata">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- The CSV Modal -->
+    <div class="modal fade" id="csvModalSenjata">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Tambah Senjata via CSV</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <form method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="file" name="csvfile" class="form-control" required>
+                        <br>
+                        <button type="submit" class="btn btn-primary" name="uploadcsvsenjata">Upload</button>
                     </div>
                 </form>
             </div>

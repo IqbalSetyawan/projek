@@ -8,12 +8,8 @@ if(isset($_POST['addmahasiswa'])){
     $nama = $_POST['nama'];
     $prodi = $_POST['prodi'];
 
-    // Generate QR code
-    $fileName = "qrcodes/" . $nim . ".png";
-    QRcode::png($nim, $fileName, "H", 4, 4);
-
     // Save data to database
-    $query = "INSERT INTO mahasiswa (nim, nama, prodi, kodeqr) VALUES ('$nim', '$nama', '$prodi', '$fileName')";
+    $query = "INSERT INTO mahasiswa (nim, nama, prodi) VALUES ('$nim', '$nama', '$prodi')";
     mysqli_query($conn, $query);
 }
 
@@ -25,12 +21,8 @@ if(isset($_POST['uploadcsv'])){
         $nama = $data[1];
         $prodi = $data[2];
 
-        // Generate QR code
-        $fileName = "qrcodes/" . $nim . ".png";
-        QRcode::png($nim, $fileName, "H", 4, 4);
-
         // Save data to database
-        $query = "INSERT INTO mahasiswa (nim, nama, prodi, kodeqr) VALUES ('$nim', '$nama', '$prodi', '$fileName')";
+        $query = "INSERT INTO mahasiswa (nim, nama, prodi) VALUES ('$nim', '$nama', '$prodi')";
         mysqli_query($conn, $query);
     }
     fclose($handle);
@@ -57,7 +49,7 @@ if(isset($_POST['uploadcsv'])){
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
-            <a class="navbar-brand" href="index.php">Sistem Data Mahasiswa UNHAN RI</a>
+            <a class="navbar-brand" href="index.php">SENJA-TA</a>
         </nav>
         <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
