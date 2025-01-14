@@ -140,6 +140,7 @@ if(isset($_POST['addmahasiswa'])){
         <script src="assets/demo/chart-bar-demo.js"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+        <script src="assets/demo/datatables-demo.js"></script>
     </body>
         <!-- The Modal -->
     <div class="modal fade" id="myModal">
@@ -149,7 +150,7 @@ if(isset($_POST['addmahasiswa'])){
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h4 class="modal-title">Tambah Mahasiswa</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal">&times;"></button>
                 </div>
                 
                 <!-- Modal body -->

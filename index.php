@@ -155,7 +155,11 @@ require_once("assets/phpqrcode/qrlib.php");
                     <div class="modal-body">
                         <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
                         <br> 
-                        <input type="text" name="keterangan" placeholder="Keterangan senjata" class="form-control" required>
+                        <select name="keterangan" class="form-control" required>
+                            <option value="" disabled selected>Pilih Keterangan</option>
+                            <option value="SS2-V5">SS2-V5</option>
+                            <option value="G6-Combat">G6-Combat</option>
+                        </select>
                         <br>
                         <button type="submit" class="btn btn-primary" name="addsenjata">Submit</button>
                     </div>

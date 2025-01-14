@@ -177,8 +177,11 @@ if (isset($_POST['senjatakembali'])) {
         <script src="assets/demo/chart-bar-demo.js"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+        <script src="assets/demo/datatables-demo.js"></script>
         <script>
             $(document).ready(function() {
+                $('#dataTable').DataTable(); // Initialize DataTables
+
                 // Handle delete button click
                 $('.delete-btn').on('click', function() {
                     if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
