@@ -45,13 +45,59 @@ if(isset($_POST['uploadcsv'])){
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/3.3.3/adapter.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
         <script type="text/javascript" src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+        <style>
+            body {
+                background: url('pictures/gudang.jpg') no-repeat center center fixed;
+                background-size: cover;
+                font-family: 'Arial', sans-serif;
+            }
+
+            .sb-topnav {
+                background: rgba(0, 0, 0, 0.8);
+            }
+
+            .sb-sidenav {
+                background: rgba(0, 0, 0, 0.9);
+            }
+
+            .card {
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .modal-content {
+                background: rgba(255, 255, 255, 0.9);
+            }
+
+            .btn-primary {
+                background: #4b79a1; /* Luxurious blue shade */
+                border: none;
+                transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+            }
+
+            .btn-primary:hover {
+                background: #283e51; /* Darker shade for hover effect */
+                transform: translateY(-5px);
+            }
+
+            h1.mt-4 {
+                font-size: 2.5em;
+                font-weight: bold;
+                color: #333;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+                margin-bottom: 20px;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+        </style>
     </head>
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
             <a class="navbar-brand" href="index.php">
                 <img src="assets/img/Logo_Unhan.png" alt="Logo Unhan" style="height: 30px; margin-right: 10px;">
-                SENJA-TA
+                <span style="font-size: 1.25em; font-weight: bold; color: #ffffff; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); font-family: 'Montserrat', sans-serif;">SENJA-TA</span>
             </a>
         </nav>
         <div id="layoutSidenav">

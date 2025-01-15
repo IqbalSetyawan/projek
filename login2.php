@@ -28,7 +28,7 @@ if(isset($_POST['login'])){
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
         <style>
             body {
-                background: url('picture/rektorat.jpg') no-repeat center center fixed;
+                background: url('picture/gasrek.jpg') no-repeat center center fixed;
                 background-size: cover;
             }
             .card {
