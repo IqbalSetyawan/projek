@@ -38,6 +38,20 @@ if(isset($_POST['login'])){
                 border: none;
                 border-radius: 1rem;
                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+                animation: float 3s ease-in-out infinite;
+            }
+            .card:hover {
+                box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.4);
+                transform: translateY(-10px);
+            }
+            @keyframes float {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
             }
             .card-header {
                 background-color: #fff;
@@ -54,10 +68,25 @@ if(isset($_POST['login'])){
                 border-radius: 2rem;
                 padding: 0.75rem 1.5rem;
                 font-size: 1rem;
-                transition: background-color 0.3s;
+                transition: background-color 0.3s, transform 0.3s;
             }
             .btn-primary:hover {
                 background-color: #0056b3;
+                transform: translateY(-3px);
+            }
+            .btn-primary:active {
+                background-color: #004494;
+                transform: translateY(1px);
+            }
+            .card-header h3 {
+                font-size: 1.75rem;
+                font-weight: bold;
+                color: #333;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+                margin-bottom: 20px;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 2px;
             }
         </style>
     </head>
