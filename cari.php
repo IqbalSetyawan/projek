@@ -7,32 +7,42 @@ if ($_SESSION['role'] !== 'mahasiswa') {
     exit();
 }
 
-// Ambil daftar mahasiswa
-$mahasiswaQuery = mysqli_query($conn, "SELECT * FROM mahasiswa");
+// Query to fetch data from the pengambilan table
+$ambildatasenjata = mysqli_query($conn, "SELECT p.*, s.nosenjata, m.nama as penerima, a.nama_acara FROM pengambilan p JOIN senjata s ON s.idsenjata = p.idsenjata JOIN mahasiswa m ON m.id_mahasiswa = p.id_mahasiswa JOIN acara_dinas a ON a.id_acara_dinas = p.id_acara_dinas");
 
-
-// Proses pengambilan senjata
-if (isset($_POST['senjatakeluar'])) {
-    $nosenjata = $_POST['nosenjata'];
-    $id_mahasiswa = $_POST['penerima'];
-    $tanggal_waktu = date('Y-m-d H:i:s');
-
-    // Ambil idsenjata berdasarkan nosenjata
-    $senjataQuery = mysqli_query($conn, "SELECT idsenjata FROM senjata WHERE nosenjata='$nosenjata'");
-    if (!$senjataQuery) {
-        die("Query failed: " . mysqli_error($conn));
-    }
-    $senjataData = mysqli_fetch_array($senjataQuery);
-    $idsenjata = $senjataData['idsenjata'];
-
-    if ($idsenjata) {
-        
-        // Redirect to prevent form resubmission
-        echo "<script>window.location.href='cari.php';</script>";
-        exit();
+// Proses pengembalian senjata
+if (isset($_POST['hapus_senjata'])) {
+    $id_pengambilan = $_POST['id_pengambilan'];
+    $deleteQuery = "DELETE FROM pengambilan WHERE id='$id_pengambilan' LIMIT 1";
+    if (!mysqli_query($conn, $deleteQuery)) {
+        echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
     } else {
-        die("Senjata dengan nomor $nosenjata tidak ditemukan.");
+        echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
     }
+    exit();
+}
+
+if (isset($_POST['senjatakembali'])) {
+    $nosenjata = $_POST['nosenjata'];
+    $id_acara_dinas = $_POST['id_acara_dinas'];
+    $nama_peminjam = $_POST['nama_peminjam'];
+    $timestamp = $_POST['timestamp'];
+    $acara = $_POST['acara'];
+    $getIdQuery = "SELECT p.id FROM pengambilan p JOIN senjata s ON p.idsenjata = s.idsenjata JOIN mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa JOIN acara_dinas a ON p.id_acara_dinas = a.id_acara_dinas WHERE s.nosenjata='$nosenjata' AND p.id_acara_dinas='$id_acara_dinas' AND m.nama='$nama_peminjam' AND p.tanggal_waktu='$timestamp' AND a.nama_acara='$acara' LIMIT 1";
+    $result = mysqli_query($conn, $getIdQuery);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $id_pengambilan = $row['id'];
+        $deleteQuery = "DELETE FROM pengambilan WHERE id='$id_pengambilan' LIMIT 1";
+        if (!mysqli_query($conn, $deleteQuery)) {
+            echo json_encode(['status' => 'error', 'message' => 'Delete query failed: ' . mysqli_error($conn)]);
+        } else {
+            echo json_encode(['status' => 'success', 'message' => 'Data pengambilan berhasil dihapus.']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Record not found.']);
+    }
+    exit();
 }
 ?>
 
@@ -112,11 +122,9 @@ if (isset($_POST['senjatakeluar'])) {
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            </a>
                             <a class="nav-link" href="cari.php">
                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Pencarian Senjata
-                            </a>
                             </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
@@ -131,6 +139,12 @@ if (isset($_POST['senjatakeluar'])) {
                         <h1 class="mt-4">Pencarian Senjata</h1>
 
                         <div class="card mb-4">
+                            <div class="card-header">
+                                <!-- Button to Open the Modal -->
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#scanModal">
+                                    Scan QR Code
+                                </button>
+                            </div>
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -145,7 +159,6 @@ if (isset($_POST['senjatakeluar'])) {
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $ambildatasenjata = mysqli_query($conn, "SELECT p.*, s.nosenjata, m.nama as penerima, a.nama_acara FROM pengambilan p JOIN senjata s ON s.idsenjata = p.idsenjata JOIN mahasiswa m ON m.id_mahasiswa = p.id_mahasiswa JOIN acara_dinas a ON a.id_acara_dinas = p.id_acara_dinas");
                                             $i = 1;
                                             while($data=mysqli_fetch_array($ambildatasenjata)){
                                                 $nosenjata = $data['nosenjata'];
@@ -153,7 +166,7 @@ if (isset($_POST['senjatakeluar'])) {
                                                 $penerima = $data['penerima'];
                                                 $acara = $data['nama_acara'];
                                             ?>
-                                            <tr>
+                                            <tr data-id="<?=$i;?>" data-nosenjata="<?=$nosenjata;?>" data-tanggal="<?=$tanggal;?>" data-penerima="<?=$penerima;?>" data-acara="<?=$acara;?>">
                                                 <td><?=$i++;?></td>
                                                 <td><?=$nosenjata;?></td>
                                                 <td><?=$tanggal;?></td>
@@ -194,4 +207,61 @@ if (isset($_POST['senjatakeluar'])) {
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="assets/demo/datatables-demo.js"></script>
     </body>
+    <!-- The Modal -->
+    <div class="modal fade" id="scanModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Scan QR Code</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <video id="preview" width="100%" style="border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);"></video>
+                    <br>
+                    <input type="text" name="nosenjata" id="nosenjata" placeholder="Nomor senjata" class="form-control" required>
+                    <br>
+                    <input type="text" name="id_pengambilan" id="id_pengambilan" placeholder="Nomor Urut" class="form-control" readonly>
+                    <br>
+                    <input type="text" name="nama_peminjam" id="nama_peminjam" placeholder="Nama Peminjam" class="form-control" readonly>
+                    <br>
+                    <input type="text" name="timestamp" id="timestamp" placeholder="Tanggal & Waktu Peminjaman" class="form-control" readonly>
+                    <br>
+                    <input type="text" name="acara" id="acara" placeholder="Acara" class="form-control" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable(); // Initialize DataTables
+
+            // Handle QR code scan
+            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+            Instascan.Camera.getCameras().then(function(cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    alert('No cameras found');
+                }
+            }).catch(function(e) {
+                console.error(e);
+            });
+
+            scanner.addListener('scan', function(c) {
+                let parts = c.split(',');
+                document.getElementById('nosenjata').value = parts[0];
+
+                $('#dataTable tbody tr').each(function() {
+                    if ($(this).data('nosenjata') === parts[0]) {
+                        $('#id_pengambilan').val($(this).data('id'));
+                        $('#nama_peminjam').val($(this).data('penerima'));
+                        $('#timestamp').val($(this).data('tanggal'));
+                        $('#acara').val($(this).data('acara'));
+                    }
+                });
+            });
+        });
+    </script>
 </html>
