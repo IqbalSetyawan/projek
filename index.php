@@ -6,23 +6,39 @@ require_once("assets/phpqrcode/qrlib.php");
 if(isset($_POST['uploadcsvsenjata'])){
     $file = $_FILES['csvfile']['tmp_name'];
     $handle = fopen($file, "r");
+    $success = true;
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
         $nosenjata = $data[0];
         $keterangan = $data[1];
 
-        // Save data to database
-        $query = "INSERT INTO senjata (nosenjata, keterangan) VALUES ('$nosenjata', '$keterangan')";
-        mysqli_query($conn, $query);
+        if (!recordExists('senjata', 'nosenjata', $nosenjata)) {
+            // Save data to database
+            $query = "INSERT INTO senjata (nosenjata, keterangan) VALUES ('$nosenjata', '$keterangan')";
+            if (!mysqli_query($conn, $query)) {
+                $success = false;
+                break;
+            }
 
-        // Generate QR code
-        $fileName = "qrcodes/" . $nosenjata . ".png";
-        QRcode::png($nosenjata, $fileName, "H", 4, 4);
+            // Generate QR code
+            $fileName = "qrcodes/" . $nosenjata . ".png";
+            QRcode::png($nosenjata, $fileName, "H", 4, 4);
 
-        // Save QR code file name in the database
-        $updateQuery = "UPDATE senjata SET kodeqr='$fileName' WHERE nosenjata='$nosenjata'";
-        mysqli_query($conn, $updateQuery);
+            // Save QR code file name in the database
+            $updateQuery = "UPDATE senjata SET kodeqr='$fileName' WHERE nosenjata='$nosenjata'";
+            if (!mysqli_query($conn, $updateQuery)) {
+                $success = false;
+                break;
+            }
+        }
     }
     fclose($handle);
+    if ($success) {
+        $_SESSION['alert'] = ['message' => 'Data berhasil diterima', 'type' => 'success'];
+    } else {
+        $_SESSION['alert'] = ['message' => 'Gagal', 'type' => 'danger'];
+    }
+    header('Location: index.php');
+    exit();
 }
 ?>
 
@@ -136,6 +152,13 @@ if(isset($_POST['uploadcsvsenjata'])){
                         <h1 class="mt-4">
                             Inventaris Senjata
                         </h1>
+
+                        <?php
+                        if (isset($_SESSION['alert'])) {
+                            showAlert($_SESSION['alert']['message'], $_SESSION['alert']['type']);
+                            unset($_SESSION['alert']);
+                        }
+                        ?>
 
                         <div class="card mb-4">
                             <div class="card-header">

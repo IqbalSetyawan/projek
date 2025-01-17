@@ -8,24 +8,45 @@ if(isset($_POST['addmahasiswa'])){
     $nama = $_POST['nama'];
     $prodi = $_POST['prodi'];
 
-    // Save data to database
-    $query = "INSERT INTO mahasiswa (nim, nama, prodi) VALUES ('$nim', '$nama', '$prodi')";
-    mysqli_query($conn, $query);
+    if (recordExists('mahasiswa', 'nim', $nim)) {
+        $_SESSION['alert'] = ['message' => 'Data sudah ada dan tidak dapat diterima', 'type' => 'danger'];
+    } else {
+        $query = "INSERT INTO mahasiswa (nim, nama, prodi) VALUES ('$nim', '$nama', '$prodi')";
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['alert'] = ['message' => 'Data berhasil diterima', 'type' => 'success'];
+        } else {
+            $_SESSION['alert'] = ['message' => 'Gagal', 'type' => 'danger'];
+        }
+    }
+    header('Location: mahasiswa.php');
+    exit();
 }
 
 if(isset($_POST['uploadcsv'])){
     $file = $_FILES['csvfile']['tmp_name'];
     $handle = fopen($file, "r");
+    $success = true;
     while(($data = fgetcsv($handle, 1000, ",")) !== FALSE){
         $nim = $data[0];
         $nama = $data[1];
         $prodi = $data[2];
 
-        // Save data to database
-        $query = "INSERT INTO mahasiswa (nim, nama, prodi) VALUES ('$nim', '$nama', '$prodi')";
-        mysqli_query($conn, $query);
+        if (!recordExists('mahasiswa', 'nim', $nim)) {
+            $query = "INSERT INTO mahasiswa (nim, nama, prodi) VALUES ('$nim', '$nama', '$prodi')";
+            if (!mysqli_query($conn, $query)) {
+                $success = false;
+                break;
+            }
+        }
     }
     fclose($handle);
+    if ($success) {
+        $_SESSION['alert'] = ['message' => 'Data berhasil diterima', 'type' => 'success'];
+    } else {
+        $_SESSION['alert'] = ['message' => 'Gagal', 'type' => 'danger'];
+    }
+    header('Location: mahasiswa.php');
+    exit();
 }
 ?>
 
@@ -136,6 +157,13 @@ if(isset($_POST['uploadcsv'])){
                 <main>
                     <div class="container-fluid">
                         <h1 class="mt-4">Data Mahasiswa</h1>
+
+                        <?php
+                        if (isset($_SESSION['alert'])) {
+                            showAlert($_SESSION['alert']['message'], $_SESSION['alert']['type']);
+                            unset($_SESSION['alert']);
+                        }
+                        ?>
 
                         <div class="card mb-4">
                             <div class="card-header">

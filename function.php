@@ -4,18 +4,39 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 $conn = mysqli_connect("localhost", "root", "","inventory");
 
+function recordExists($table, $column, $value) {
+    global $conn;
+    $query = "SELECT * FROM $table WHERE $column='$value'";
+    $result = mysqli_query($conn, $query);
+    return mysqli_num_rows($result) > 0;
+}
+
+function showAlert($message, $type = 'success') {
+    echo "<div class='alert alert-$type alert-dismissible fade show' role='alert'>
+            $message
+            <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>";
+}
+
 // Menambah senjata baru
 if (isset($_POST['addsenjata'])) {
     $nosenjata = $_POST['nosenjata'];
     $keterangan = $_POST['keterangan'];
 
-    $addtotable = mysqli_query($conn, "INSERT INTO senjata (nosenjata, keterangan) VALUES ('$nosenjata', '$keterangan')");
-    if ($addtotable) {
-        header('Location: index.php');
+    if (recordExists('senjata', 'nosenjata', $nosenjata)) {
+        $_SESSION['alert'] = ['message' => 'Data sudah ada dan tidak dapat diterima', 'type' => 'danger'];
     } else {
-        echo 'Gagal';
-        header('Location: index.php');
+        $addtotable = mysqli_query($conn, "INSERT INTO senjata (nosenjata, keterangan) VALUES ('$nosenjata', '$keterangan')");
+        if ($addtotable) {
+            $_SESSION['alert'] = ['message' => 'Data berhasil diterima', 'type' => 'success'];
+        } else {
+            $_SESSION['alert'] = ['message' => 'Gagal', 'type' => 'danger'];
+        }
     }
+    header('Location: index.php');
+    exit();
 }
 
 // Menambah pengambilan senjata
@@ -31,18 +52,26 @@ if (isset($_POST['senjatakeluar'])) {
     $idsenjata = $senjataData['idsenjata'] ?? null;
 
     if ($idsenjata) {
+        // Periksa apakah idsenjata sudah ada di tabel pengambilan
+        $checkQuery = mysqli_query($conn, "SELECT * FROM pengambilan WHERE idsenjata='$idsenjata'");
+        if (mysqli_num_rows($checkQuery) > 0) {
+            $_SESSION['alert'] = ['message' => 'Data sudah ada dan tidak dapat diterima', 'type' => 'danger'];
+            header('Location: pengambilan.php');
+            exit();
+        }
+
         // Simpan data pengambilan ke dalam tabel pengambilan
         $insertQuery = "INSERT INTO pengambilan (idsenjata, tanggal_waktu, id_mahasiswa, id_acara_dinas) VALUES ('$idsenjata', '$tanggal_waktu', '$id_mahasiswa', '$id_acara_dinas')";
         if (mysqli_query($conn, $insertQuery)) {
-            header('Location: pengambilan.php');
+            $_SESSION['alert'] = ['message' => 'Data berhasil diterima', 'type' => 'success'];
         } else {
-            echo 'Gagal: ' . mysqli_error($conn);
-            header('Location: pengambilan.php');
+            $_SESSION['alert'] = ['message' => 'Gagal: ' . mysqli_error($conn), 'type' => 'danger'];
         }
     } else {
-        echo 'Senjata dengan nomor ' . $nosenjata . ' tidak ditemukan.';
-        header('Location: pengambilan.php');
+        $_SESSION['alert'] = ['message' => 'Senjata dengan nomor ' . $nosenjata . ' tidak ditemukan.', 'type' => 'danger'];
     }
+    header('Location: pengambilan.php');
+    exit();
 }
 
 // Menghapus pengambilan senjata
